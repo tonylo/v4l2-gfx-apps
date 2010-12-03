@@ -1,0 +1,47 @@
+
+v4l2_gfx_client
+---------------
+
+	Unit tests for the V4L2-GFX driver. It can also memcpy frames from a raw
+NV12 file to the V4L2-GFX device.
+
+gles1_texture_player
+--------------------
+
+	GLES1 application demonstrating texture streaming. This will just stream
+a flat video image, so is useful to see the basic throughput of a video stream
+without the overhead of 3D effects.
+
+	When built using the makefile in the "jni" sub-directory this will build a
+Linux command line application. The makefile under the top-level directory is
+used for Android builds, Android is a little strange in that an APK (Android
+application package) is built with a Java UI front-end and a native (C) shared
+library.
+
+Running gles1_texture_player (Linux)
+------------------------------------
+
+	Start the gles1_texture_player application from the command line. You
+should see a message "Waiting for MM device". At this point you need to start
+a V4L2 client application decoding to the V4L2-GFX device.
+
+	If the V4L2-GFX device node is /dev/video100 (usually it is), ensure that
+the decoding application has permission to write to the device.
+
+	Here is an example using GStreamer (From a Ubuntu-Maverick OMAP image with a
+working GStreamer setup):
+
+	gst-launch playbin2 uri=file:///home/ubuntu/batman_begins_1080p.mov video-sink="fpsdisplaysink text-overlay=false video-sink=v4l2sink\ device=/dev/video100\ min-queued-bufs=3"
+
+	You can also use the v4l2_gfx_client as mentioned above, although consider
+that the system performance will be severely effected by the app having to 
+copy frames to V4L2 memory mapped buffers. For example:
+
+	v4l2_gfx_client -f 320x240.nv12 -w 320 -h 240
+
+gles2_texture_player
+--------------------
+
+	GLES2 texture streaming application, similar to GLES1 except a simple
+3D effect is applied.
+
