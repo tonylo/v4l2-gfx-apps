@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Gles1TexturePlayer</string>
+    <string name="mediafile_prompt">Media file:</string>
+    <string name="button_launchvideo">Launch video</string>
+    <string name="button_launchstream">Launch existing stream</string>
+</resources>

@@ -1,0 +1,22 @@
+# 
+# File	         makefile.linux
+# Title          Unit test makefile
+#
+# Copyright      Copyright (C) 2010 Texas Instruments.
+#
+
+PLAYER_VER=GLES1
+
+MODULE_CFLAGS += -Wstrict-prototypes -Wno-unused-parameter
+INCLUDES       = $(UNITTEST_INCLUDES) -I$(KERNELDIR)/include
+
+MODULE        = gles1_texture_player
+SOURCES			= texplayer.c texplayer_simple.c
+MODULE_CFLAGS += -DGLES1_TEXTURE_PLAYER
+LIBS			= $(OGLES1_LIBS)
+LIB_DEPS		= $(OGLES1_LIBDEPS)
+
+MODULE_CFLAGS += -DOPENGLES=1
+
+LIBS			+= -lm
+VPATH			+= 

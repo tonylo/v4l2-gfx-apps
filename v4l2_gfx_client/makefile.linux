@@ -1,0 +1,26 @@
+############################################################################
+# File	         makefile.linux
+# Title          V4L2 GFX client (test)
+#
+# Copyright      (C) 2010 Texas Instruments.
+############################################################################
+
+NO_EXPORT_CHECKING = 1
+
+MODULE_CFLAGS	= -W -Wall -D_LARGEFILE64_SOURCE -D_BSD_SOURCE
+
+MODULE			= v4l2_gfx_client
+
+LD_FLAGS		+= -Bsymbolic -Bsymbolic-functions
+
+SOURCES			= main.c testfmwk.c
+
+INCLUDES		= $(UNITTEST_INCLUDES) -I$(KERNELDIR)/include
+
+LIBS			= $(UNITTEST_LIBS)
+
+$(SYSBIN)/320x240.nv12: 320x240.nv12
+	$(SILENT)$(CP) 320x240.nv12 $(SYSBIN)
+
+PRE_REQ = $(SYSBIN)/320x240.nv12
+allclean: clean

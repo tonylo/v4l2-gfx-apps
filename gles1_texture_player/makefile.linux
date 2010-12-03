@@ -1,0 +1,98 @@
+# 
+# File	         Makefile.linux
+#
+# Title          Self contained makefile for Texture Player Android app
+#                and associated JNI code.
+#
+# Copyright      Copyright (C) 2010 Texas Instruments.
+#
+
+CUSTOM_TARGET = 1
+NO_EXPORT_CHECKING = 1
+MODULE		= libgles1_texture_player.so
+APK			= ${SYSBIN}/gles1_texture_player.apk
+
+BIN	:= out/${BIN}
+TMP := out/${TMP}
+
+VERSION		= --min-sdk-version 5 --target-sdk-version 5 --version-code 5 --version-name 2.0
+
+CLASSPATH	= ${TARGET_ROOT}/common/obj/JAVA_LIBRARIES/android_stubs_current_intermediates/classes.jar:../common/out/classes.jar
+INCLUDE		= ${TARGET_ROOT}/common/obj/APPS/framework-res_intermediates/package-export.apk
+TESTKEYPEM	= ${ANDROID_ROOT}/build/target/product/security/testkey.x509.pem
+TESTKEYPK8	= ${ANDROID_ROOT}/build/target/product/security/testkey.pk8
+SIGNAPK		= ${ANDROID_ROOT}/out/host/linux-x86/framework/signapk.jar
+BINDIR		= ${ANDROID_ROOT}/out/host/linux-x86/bin
+
+AAPT		= ${BINDIR}/aapt
+DX			= ${BINDIR}/dx
+JAVA		= java
+JAVAC		= javac
+JAR			= jar
+ZIP			= zip
+ZIPALIGN	= ${BINDIR}/zipalign
+
+JNILIB		= out/lib/${JNI_CPU_ABI}/${MODULE}
+
+VPATH		= jni
+SOURCES		= texplayer.c texplayer_simple.c
+
+INCLUDES	+= -I${EURASIAROOT}/eurasiacon/unittests/include -Ijni \
+			  -I${ANDROID_ROOT}/dalvik/libnativehelper/include \
+			  -I${ANDROID_ROOT}/frameworks/base/opengl/include \
+			  $(UNITTEST_INCLUDES)
+MODULE_CFLAGS = -D_BSD_SOURCE -Wstrict-prototypes
+
+MODULE_CFLAGS += -DOPENGLES=1
+
+LIBS		= $(OGLES1_LIBS)
+LIB_DEPS	= $(OGLES1_LIBDEPS)
+LIBS		+= -lm
+
+genresources:
+	${SILENT}if [ ! -d out ]; then ${MKDIR} out; fi
+	${SILENT}${AAPT} package -u -z -c en_US,mdpi,nodpi -M AndroidManifest.xml \
+		-I ${INCLUDE} ${VERSION} -S res -F out/package.apk -J out
+
+out/classes.jar: genresources
+	${SILENT}if [ ! -d out/classes ]; then ${MKDIR} out/classes; fi
+	${SILENT}${JAVAC} -target 1.5 -Xmaxerrs 9999999 -encoding ascii \
+	         -classpath ${CLASSPATH} -g -extdirs "" -d out/classes \
+	         `find out src -type f -name '*.java' | xargs`
+	${SILENT}${JAR} -cf out/classes.jar -C out/classes .
+	${SILENT}${RM} -r out/classes
+
+out/classes.dex: out/classes.jar
+	${SILENT}${DX} --dex --output=out/classes.dex out/classes.jar
+
+${JNILIB}: ${SYSBIN}/${MODULE}
+	${SILENT}if [ ! -d out/lib/${JNI_CPU_ABI} ]; then \
+		${MKDIR} out/lib/${JNI_CPU_ABI}; \
+	fi
+	${SILENT}${CP} ${SYSBIN}/${MODULE} ${JNILIB}
+
+out/package.apk: ${JNILIB} out/classes.dex
+	@cd out && ${ZIP} -qr package.zip lib && ${MV} -f package.zip package.apk && cd ..
+	${SILENT}${AAPT} package -u -z -c en_US,mdpi,nodpi -M AndroidManifest.xml \
+		-I ${INCLUDE} ${VERSION} -S res -F out/package.apk -J out
+	${SILENT}${AAPT} add -k out/package.apk out/classes.dex >/dev/null
+	${SILENT}${MV} -f out/package.apk out/package.apk.unsigned
+	${SILENT}${JAVA} -jar ${SIGNAPK} ${TESTKEYPEM} ${TESTKEYPK8} \
+	    out/package.apk.unsigned out/package.apk
+	${SILENT}${MV} -f out/package.apk out/package.apk.unaligned
+	${SILENT}${ZIPALIGN} -f 4 out/package.apk.unaligned out/package.apk
+
+${APK}: out/package.apk
+	${SILENT}${CP} out/package.apk ${APK}
+
+hack_clean:
+	${SILENT}${RM} -r out
+
+clean: hack_clean
+clobber: hack_clean
+
+PRE_REQ = ${APK}
+
+package:
+
+symbolpackage:
