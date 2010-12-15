@@ -1,4 +1,21 @@
 
+Introduction
+------------
+These applications are used to demonstrate texture streaming with the SGX
+GPU on the OMAP4 SoC utilizing the the V4L2-GFX driver built again a Linux
+kernel.
+
+These apps are developed on both Linux & Android.
+
+Dependencies
+------------
+All the applications need the V4L2-GFX driver installed.
+
+The applications need the header file for private ioctls to the V4L2-GFX driver
+see:
+
+https://github.com/tonylo/v4l2-gfx/tree/master/include/linux/omap_v4l2_gfx.h
+
 v4l2_gfx_client
 ---------------
 
