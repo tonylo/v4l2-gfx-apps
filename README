@@ -12,11 +12,10 @@ gles1_texture_player
 a flat video image, so is useful to see the basic throughput of a video stream
 without the overhead of 3D effects.
 
-	When built using the makefile in the "jni" sub-directory this will build a
-Linux command line application. The makefile under the top-level directory is
-used for Android builds, Android is a little strange in that an APK (Android
-application package) is built with a Java UI front-end and a native (C) shared
-library.
+Sub-directories:
+	src			Common native C source code
+	android		Build an Android APK and a C shared library used with JNI
+	linux		Null window build
 
 Running gles1_texture_player (Linux)
 ------------------------------------
@@ -45,3 +44,7 @@ gles2_texture_player
 	GLES2 texture streaming application, similar to GLES1 except a simple
 3D effect is applied.
 
+Sub-directories:
+	src			Common native C source code
+	android		Build an Android APK and a C shared library used with JNI
+	linux		Null window build

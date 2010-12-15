@@ -9,8 +9,8 @@
 
 CUSTOM_TARGET = 1
 NO_EXPORT_CHECKING = 1
-MODULE		= libgles1_texture_player.so
-APK			= ${SYSBIN}/gles1_texture_player.apk
+MODULE		= libgles2_texture_player.so
+APK			= ${SYSBIN}/gles2_texture_player.apk
 
 BIN	:= out/${BIN}
 TMP := out/${TMP}
@@ -34,19 +34,19 @@ ZIPALIGN	= ${BINDIR}/zipalign
 
 JNILIB		= out/lib/${JNI_CPU_ABI}/${MODULE}
 
-VPATH		= jni
-SOURCES		= texplayer.c texplayer_simple.c
+VPATH		= ../src
+SOURCES		= texplayer2.c texplayer_gles2.c
 
-INCLUDES	+= -I${EURASIAROOT}/eurasiacon/unittests/include -Ijni \
+INCLUDES	+= -I${EURASIAROOT}/eurasiacon/unittests/include -I../src \
 			  -I${ANDROID_ROOT}/dalvik/libnativehelper/include \
 			  -I${ANDROID_ROOT}/frameworks/base/opengl/include \
 			  $(UNITTEST_INCLUDES)
 MODULE_CFLAGS = -D_BSD_SOURCE -Wstrict-prototypes
 
-MODULE_CFLAGS += -DOPENGLES=1
+MODULE_CFLAGS += -DOPENGLES=2
 
-LIBS		= $(OGLES1_LIBS)
-LIB_DEPS	= $(OGLES1_LIBDEPS)
+LIBS		= $(OGLES2_LIBS)
+LIB_DEPS	= $(OGLES2_LIB_DEPS)
 LIBS		+= -lm
 
 genresources:

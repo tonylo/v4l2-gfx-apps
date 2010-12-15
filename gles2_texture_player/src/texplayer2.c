@@ -154,8 +154,8 @@ static int init_display(
             eglcontxt)) != EGL_TRUE)
         egl_error("eglMakeCurrent");
 
-	printf("swap interval = 0\n");
-	eglSwapInterval(egldpy, (EGLint)0);
+	//printf("swap interval = 0\n");
+	//eglSwapInterval(egldpy, (EGLint)0);
 
     return 1;
 }
