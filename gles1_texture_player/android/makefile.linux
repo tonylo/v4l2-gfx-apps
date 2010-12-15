@@ -35,7 +35,7 @@ ZIPALIGN	= ${BINDIR}/zipalign
 JNILIB		= out/lib/${JNI_CPU_ABI}/${MODULE}
 
 VPATH		= ../src
-SOURCES		= texplayer.c texplayer_simple.c
+SOURCES		= texplayer.c texplayer_gles1.c v4l2_gfx.c misc.c
 
 INCLUDES	+= -I${EURASIAROOT}/eurasiacon/unittests/include -I../src \
 			  -I${ANDROID_ROOT}/dalvik/libnativehelper/include \

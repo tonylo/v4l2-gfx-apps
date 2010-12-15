@@ -11,8 +11,8 @@ MODULE_CFLAGS	+= -Wstrict-prototypes -Wno-unused-parameter
 INCLUDES		= $(UNITTEST_INCLUDES) -I$(KERNELDIR)/include
 
 MODULE			= gles2_texture_player
-VPATH			= ../src/
-SOURCES			= texplayer2.c texplayer_gles2.c
+VPATH			+= ../src/
+SOURCES			= texplayer2.c texplayer_gles2.c v4l2_gfx.c misc.c
 MODULE_CFLAGS	+= -DGLES2_TEXTURE_PLAYER
 LIBS			= $(OGLES2_LIBS)
 LIB_DEPS		= $(OGLES2_LIBDEPS)

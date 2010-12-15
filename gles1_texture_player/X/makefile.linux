@@ -1,0 +1,34 @@
+# 
+# File             makefile.linux
+# Title          Unit test makefile
+#
+# Copyright      2006 by Imagination Technologies Limited. 
+#                All rights reserved.
+#                No part of this software, either material or conceptual 
+#                may be copied or distributed, transmitted, transcribed,
+#                stored in a retrieval system or translated into any 
+#                human or computer language in any form by any means,
+#                electronic, mechanical, manual or other-wise, or 
+#                disclosed to third parties without the express written
+#                permission of Imagination Technologies Limited, Unit 8, 
+#                HomePark  Industrial Estate, King's Langley, Hertfordshire,
+#                WD4 8LZ, U.K.
+#
+# $Log: makefile.linux $
+#
+
+MODULE        = xgles1_texture_player
+MODULE_CFLAGS = -Wstrict-prototypes
+INCLUDES      = $(UNITTEST_INCLUDES)
+
+VPATH         += ../src/
+SOURCES       = xtexplayer.c v4l2_gfx.c misc.c texplayer_gles1.c
+
+#MODULE_CFLAGS   += -DPROFILE_COMMON=1
+
+LIBS            = $(OGLES1_LIBS)
+LIB_DEPS        = $(OGLES1_LIB_DEPS)
+
+LIBS            += -lm -lX11 -lXau -lXdmcp
+
+VPATH           +=

@@ -1,18 +1,17 @@
 /*!****************************************************************************
 @File           texplayer.h
 
-@Title          Texture Player
+@Title
 
 @Author         Texas Instruments
 
-@Date           2010/08/19
+@Date           2010/12/15
 
 @Copyright      Copyright (C) 2010 Texas Instruments.
 
 @Platform       Android/Linux
 
-@Description    In coordination with another application streaming to the
-                buffer class device we render the content on the screen
+@Description
 
 ******************************************************************************/
 
@@ -21,7 +20,6 @@
 
 #if defined(SUPPORT_ANDROID_PLATFORM)
 #include <nativehelper/jni.h>
-
 #define LOG_TAG "GLES2TEXPLAYER"
 #include <cutils/log.h>
 #define INFO  LOGI
@@ -38,31 +36,25 @@ extern void timestamp(void);
 
 #if defined(SUPPORT_ANDROID_PLATFORM)
 JNIEXPORT jint JNICALL Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_init(
-	JNIEnv *env, jobject obj, jstring wrapLib);
+        JNIEnv *env, jobject obj, jstring wrapLib);
 
 JNIEXPORT jint JNICALL Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_eglMain(
-	JNIEnv *env, jobject obj, jobject eglNativeWindow);
+        JNIEnv *env, jobject obj, jobject eglNativeWindow);
 
 JNIEXPORT void JNICALL Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_resizeWindow(
-	JNIEnv *env, jobject obj, jint width, jint height);
+        JNIEnv *env, jobject obj, jint width, jint height);
 
 JNIEXPORT void JNICALL Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_requestQuit(
-	JNIEnv *env, jobject obj);
+        JNIEnv *env, jobject obj);
 #endif	// SUPPORT_ANDROID_PLATFORM
 
-extern int v4l2_wait(int fd);
-extern int acquire_v4l2_frame(int fd, struct v4l2_gfx_buf_params* p);
-extern int release_v4l2_frame(int fd, int bufid);
-
 /* texplayer_gles2 */
-extern int init_glstate(int fd);
-extern void gles2_deinit_glstate(void);
-extern void stream_texture(int dev, void *dev2texturearg);
-extern void draw_frame(int fd);
+extern int gl_init_state(int fd, EGLDisplay a_egldpy, EGLSurface a_eglsurface, EGLContext a_eglcontxt, int num_devices);
+extern void gl_deinit_state(void);
+extern int gl_stream_texture(int dev);
+extern int gl_draw_frame(int fd);
 
-/* texplayer_simple */
-extern int init_glstate_simple(int fd);
-extern void stream_texture_simple(int dev, void *dev2texturearg);
-extern void draw_frame_simple(int fd);
+#include "v4l2_gfx.h"
+#include "misc.h"
 
 #endif /* __TEXPLAYER_H__ */

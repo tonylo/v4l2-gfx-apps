@@ -12,7 +12,7 @@ INCLUDES		= $(UNITTEST_INCLUDES) -I$(KERNELDIR)/include
 
 MODULE			= gles1_texture_player
 VPATH			= ../src/
-SOURCES			= texplayer.c texplayer_simple.c
+SOURCES			= texplayer.c texplayer_gles1.c misc.c v4l2_gfx.c
 MODULE_CFLAGS += -DGLES1_TEXTURE_PLAYER
 LIBS			= $(OGLES1_LIBS)
 LIB_DEPS		= $(OGLES1_LIBDEPS)
