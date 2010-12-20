@@ -213,7 +213,7 @@ static void *tutil_open_video(
 
         framesz = (width * height) * 3 / 2; /* NV12 */
 
-        fd = open(vid_name, O_RDWR|O_LARGEFILE);
+        fd = open(vid_name, O_RDONLY|O_LARGEFILE);
         if (fd < 0) {
                 printf("ERROR: could not open YUV file\n");
                 exit(-1);
@@ -228,13 +228,13 @@ static void *tutil_open_video(
         printf("File bytes %llu\n", vidsz);
         lseek(fd, 0, SEEK_SET);
 
-        yuv_buf = mmap(NULL, vidsz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        yuv_buf = mmap(NULL, vidsz, PROT_READ, MAP_SHARED, fd, 0);
         if (yuv_buf == MAP_FAILED) {
                 int maxframes = 1073741824 / framesz;
 
                 printf("First mmap failed, try to map 1GB of the file\n");
                 vidsz = maxframes * framesz;
-                yuv_buf = mmap(NULL, vidsz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+                yuv_buf = mmap(NULL, vidsz, PROT_READ, MAP_SHARED, fd, 0);
                 if (yuv_buf == MAP_FAILED) {
                         printf("ERROR: mmap %s\n", vid_name);
                         exit(-1);
