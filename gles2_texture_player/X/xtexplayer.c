@@ -411,6 +411,11 @@ event_loop(Display *dpy, Window win, EGLDisplay display, EGLSurface surface, int
         }
 }
 
+static Bool WaitForMapNotify( Display *d, XEvent *e, char *arg )
+{
+        UNUSED(d);
+        return (e->type == MapNotify) && (e->xmap.window == (Window)arg);
+}
 
 
 /*
@@ -435,11 +440,17 @@ make_window(Display *dpy,
         int XResult = BadImplementation;
         int blackColour = BlackPixel(dpy, DefaultScreen(dpy));
         EGLint context_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
+        int dimx = 1, dimy = 1;
+        XEvent event;
+        Atom wmDelete;
+        dimx = XDisplayWidth(dpy, DefaultScreen(dpy));
+        dimy = XDisplayHeight(dpy, DefaultScreen(dpy));
+        INFO("dimx = %d, dimy = %d\n", dimx, dimy);
 
-		UNUSED(scr);
-		UNUSED(name);
+        UNUSED(scr);
+        UNUSED(name);
 
-        win = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0, 1, 1,
+        win = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0, dimx, dimy,
                                   0, blackColour, blackColour);
         if(bExactPositionSpecified) {
                 XMoveResizeWindow(dpy, win, aiX, aiY, auiW, auiH);
@@ -459,6 +470,34 @@ make_window(Display *dpy,
         }
 
         XMapWindow(dpy, win);
+
+        if (fullscreen) {
+                XEvent xev;
+                Atom wmState;
+                Atom wmStateFullscreen;
+
+                XIfEvent( dpy, &event, WaitForMapNotify, (char*)win );
+
+                wmState = XInternAtom(dpy, "_NET_WM_STATE", False);
+                wmStateFullscreen = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
+
+                memset(&xev, 0, sizeof(XEvent));
+                xev.type = ClientMessage;
+                xev.xclient.window = win;
+                xev.xclient.message_type = wmState;
+                xev.xclient.format = 32;
+                xev.xclient.data.l[0] = 1;
+                xev.xclient.data.l[1] = wmStateFullscreen;
+                xev.xclient.data.l[2] = 0;
+                XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureNotifyMask, &xev);
+
+                /* This bit needed as well */
+                wmDelete = XInternAtom(dpy, "WM_DELETE_WINDOW", True);
+                XSetWMProtocols(dpy, win, &wmDelete, 1);
+                XSetWMColormapWindows( dpy, win, &win, 1 );
+
+
+        }
 
         XFlush(dpy);
 
