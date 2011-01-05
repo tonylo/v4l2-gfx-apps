@@ -18,7 +18,7 @@
 #ifndef __V4L2_GFX_LCL_H__
 #define __V4L2_GFX_LCL_H__
 
-#include <linux/omap_v4l2_gfx.h>
+#include <omap_v4l2_gfx.h>
 
 extern int v4l2_open(void);
 extern int v4l2_wait(int fd);

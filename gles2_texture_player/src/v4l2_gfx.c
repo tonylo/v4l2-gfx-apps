@@ -6,9 +6,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#if !defined(SUPPORT_ANDROID_PLATFORM)
 #include <stropts.h>
+#endif
 
-#include <linux/omap_v4l2_gfx.h>
 #include "v4l2_gfx.h"
 #include "misc.h"
 

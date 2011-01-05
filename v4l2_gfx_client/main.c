@@ -38,7 +38,7 @@
 #include <sys/ioctl.h>
 
 #include <linux/videodev.h>
-#include <linux/omap_v4l2_gfx.h>
+#include <omap_v4l2_gfx.h>
 
 #include "testfmwk.h"
 

@@ -29,7 +29,7 @@
 #include <dlfcn.h>
 
 #include <linux/videodev.h>
-#include <linux/omap_v4l2_gfx.h>
+#include <omap_v4l2_gfx.h>
 
 #if defined(SUPPORT_ANDROID_PLATFORM)
 #include <private/ui/android_natives_priv.h>
