@@ -54,6 +54,12 @@ extern void gl_deinit_state(void);
 extern int gl_stream_texture(int dev);
 extern int gl_draw_frame(int fd);
 
+/* N.B. These values must sync with the java sources */
+#define GLAPP_PARM_NONE 0
+#define GLAPP_PARM_ANIMATED 1
+
+extern void gl_set_app_params(int a_parm, int a_value);
+
 #include "v4l2_gfx.h"
 #include "misc.h"
 

@@ -49,6 +49,18 @@ EGLDisplay egldpy;
 EGLSurface eglsurface;
 EGLContext eglcontxt;
 
+/* Application state */
+#define G_APP_ANIMATE  0x1;
+//unsigned int g_appstate = G_APP_ANIMATE;
+unsigned int g_appstate = 0;
+
+//static unsigned int state(void) { return g_appstate; }
+static int state_isanimated(void)
+{
+        return g_appstate & G_APP_ANIMATE;
+}
+
+/* IMG texture streaming fns */
 PFNGLTEXBINDSTREAMIMGPROC glTexBindStreamIMG;
 PFNGLGETTEXSTREAMDEVICEATTRIBUTEIVIMGPROC glGetTexAttrIMG;
 PFNGLGETTEXSTREAMDEVICENAMEIMGPROC glGetTexDevIMG;
@@ -60,6 +72,7 @@ GLuint **pptex_objs;
 static int program[2];
 
 GLint model_view_idx[2], proj_idx[2];
+
 float projection[16] = {
         4.0f,     0.0f,     0.0f,     0.0f,
         0.0f,     4.0f,     0.0f,     0.0f,
@@ -73,26 +86,9 @@ float modelview[16] = {
         0.0f,     0.0f,    -9.0f,     1.0f
 };
 
-static GLfloat vertices[16][3] = {
-        // x     y     z          id
-        {-1.0, -1.0,  1.0}, // 1  0 left    First Strip
-        {-1.0,  1.0,  1.0}, // 3  1
-        {-1.0, -1.0, -1.0}, // 0  2
-        {-1.0,  1.0, -1.0}, // 2  3
-        { 1.0, -1.0, -1.0}, // 4  4  back
-        { 1.0,  1.0, -1.0}, // 6  5
-        { 1.0, -1.0,  1.0}, // 5  6 right
-        { 1.0,  1.0,  1.0}, // 7  7
+extern GLfloat **g_vertices_flat;
+extern GLfloat **g_vertices_anim;
 
-        { 1.0,  1.0, -1.0}, // 6  8 top     Second Strip
-        {-1.0,  1.0, -1.0}, // 2  9
-        { 1.0,  1.0,  1.0}, // 7  10
-        {-1.0,  1.0,  1.0}, // 3  11
-        { 1.0, -1.0,  1.0}, // 5  12 front
-        {-1.0, -1.0,  1.0}, // 1  13
-        { 1.0, -1.0, -1.0}, // 4  14 bottom
-        {-1.0, -1.0, -1.0}  // 0  15
-};
 #define VER_POS_SIZE 3     /* x, y and z */
 
 static GLfloat Normals[16][3] = {  // One normal per vertex.
@@ -160,24 +156,8 @@ static GLfloat texcoord[16][2] = {
 };
 #define TEX_COORD_SIZE 2     /* s and t */
 
-/* Shader programs */
-/* Vertex shader */
-const char *vshader_src =
-        "uniform mat4 modelview;\n"
-        "uniform mat4 projection;\n"
-        "attribute vec4 vertex;\n"
-        "attribute vec4 color;\n"
-        "attribute vec3 normal;\n"
-        "varying mediump vec4 v_color;\n"
-        "attribute vec2 inputtexcoord;\n"
-        "varying mediump vec2 texcoord;\n"
-        "void main()\n"
-        "{\n"
-        "   vec4 eye_vertex = modelview*vertex;\n"
-        "   gl_Position = projection*eye_vertex;\n"
-        "   v_color = color;\n"
-        "   texcoord = inputtexcoord;\n"
-        "}";
+extern const char *g_vshader_flat;
+extern const char *g_vshader_anim;
 
 /* Fragment shader */
 const char *fshader_2 =
@@ -218,7 +198,7 @@ static int dev2texturecnt = sizeof(dev2texture)/sizeof(GLenum);
 
 int gl_stream_texture(int dev)
 {
-//    const GLubyte *bc_dev_name;
+        /* const GLubyte *bc_dev_name; */
         int no_buffers, width, height, format;
         int idx;
         INFO(">> stream_texture dev = %d", dev); // XXX
@@ -227,7 +207,7 @@ int gl_stream_texture(int dev)
                 return -1;
         }
 
-#if 0
+#if 0   /* Code might be used in the future */
         /* get the device id */
         bc_dev_name = glGetTexDevIMG(dev);
         if (!bc_dev_name)
@@ -241,7 +221,7 @@ int gl_stream_texture(int dev)
         glGetTexAttrIMG(dev, GL_TEXTURE_STREAM_DEVICE_FORMAT_IMG, &format);
 
         INFO("\ndevice: %d num: %d, width: %d, height: %d, format: \
-            0x%x\n", dev, no_buffers, width, height, format);
+             0x%x\n", dev, no_buffers, width, height, format);
 
         /* allocate texture objects */
         pptex_objs[dev] = malloc(sizeof(GLuint)*no_buffers);
@@ -273,6 +253,8 @@ int gl_init_state(int fd, EGLDisplay a_egldpy, EGLSurface a_eglsurface, EGLConte
         const GLubyte *glext;
         int shader_status;
         int i;
+        const char *vshader_src;
+        GLvoid *vertices;
 
         egldpy = a_egldpy;
         eglsurface = a_eglsurface;
@@ -312,13 +294,20 @@ int gl_init_state(int fd, EGLDisplay a_egldpy, EGLSurface a_eglsurface, EGLConte
                 return -3;
         }
 
+        if (state_isanimated()) {
+                vshader_src = g_vshader_anim;
+                vertices = &g_vertices_anim;
+        } else {
+                vshader_src = g_vshader_flat;
+                vertices = &g_vertices_flat;
+        }
 
         /* Initialize shaders */
         ver_shader = glCreateShader(GL_VERTEX_SHADER);
         frag_shader[0] = glCreateShader(GL_FRAGMENT_SHADER);
         frag_shader[1] = glCreateShader(GL_FRAGMENT_SHADER);
 
-        ERROR("created shaders\n");
+        INFO("created shaders\n");
 
         /* Attach and compile shaders */
         /* shader source is null terminated */
@@ -443,40 +432,54 @@ void gl_deinit_state(void)
         free(pptex_objs);
 }
 
+void gl_set_app_params(int a_parm, int a_value)
+{
+        switch (a_parm) {
+        case GLAPP_PARM_ANIMATED:
+                if (a_value) {
+                        g_appstate |= G_APP_ANIMATE;
+                } else {
+                        g_appstate &= ~G_APP_ANIMATE;
+                }
+                break;
+        default:
+                break;
+        }
+}
+
 int gl_draw_frame(int fd)
 {
         static float rot_x = 0.0;
         static float rot_y = 0.0;
-        float sx, cx, sy, cy;
         int tex_sampler, i=0;
         int rv=0, bufid;
         struct v4l2_gfx_buf_params p;
 
-        /* rotate the cube */
-        sx = (float)sin(rot_x);
-        cx = (float)cos(rot_x);
-        sy = (float)sin(rot_y);
-        cy = (float)cos(rot_y);
+        if (state_isanimated()) {
+                /* rotate the cube */
+                float sx, cx, sy, cy;
+                sx = (float)sin(rot_x);
+                cx = (float)cos(rot_x);
+                sy = (float)sin(rot_y);
+                cy = (float)cos(rot_y);
 
-        modelview[0] = cy;
-        modelview[1] = 0;
-        modelview[2] = -sy;
-        modelview[4] = sy*sy;
-        modelview[5] = cx;
-        modelview[6] = cy*sx;
-        modelview[8] = sy*cx;
-        modelview[9] = -sx;
-        modelview[10] = cx*cy;
+                modelview[0] = cy;
+                modelview[1] = 0;
+                modelview[2] = -sy;
+                modelview[4] = sy*sy;
+                modelview[5] = cx;
+                modelview[6] = cy*sx;
+                modelview[8] = sy*cx;
+                modelview[9] = -sx;
+                modelview[10] = cx*cy;
+        }
 
-//	glClearColor(0.0, 0.0, 1.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(program[0]);
 
         glUniformMatrix4fv(model_view_idx[0], 1, GL_FALSE, modelview);
         glUniformMatrix4fv(proj_idx[0], 1, GL_FALSE, projection);
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         rv = acquire_v4l2_frame(fd, &p);
         bufid = p.bufid;
@@ -501,6 +504,7 @@ int gl_draw_frame(int fd)
         glUniformMatrix4fv(model_view_idx[1], 1, GL_FALSE, modelview);
         glUniformMatrix4fv(proj_idx[1], 1, GL_FALSE, projection);
 
+        /* index must not be > than size of vertices array */
         glDrawArrays(GL_TRIANGLE_STRIP, i*4, 4);
         eglSwapBuffers(egldpy, eglsurface);
 

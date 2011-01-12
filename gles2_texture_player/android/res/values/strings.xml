@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Gles2TexturePlayer</string>
-    <string name="mediafile_prompt">Media file:</string>
-    <string name="button_launchvideo">Launch video</string>
-    <string name="button_launchstream">Launch existing stream</string>
+    <string name="mediafile_prompt">Media File:</string>
+    <string name="button_launchvideo">Play Media File</string>
+    <string name="button_launchstream">Wait For Test Stream</string>
+    <string name="cb_animated">Enable 3D Animation</string>
 </resources>

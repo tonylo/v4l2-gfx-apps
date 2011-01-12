@@ -45,10 +45,6 @@
 #include "eglhelper.h"
 
 static jfieldID	gSurfaceFieldID;
-typedef int  (*EglMain_t)(EGLNativeDisplayType display,
-                          EGLNativeWindowType window);
-typedef void (*ResizeWindow_t)(unsigned int width, unsigned int height);
-typedef void (*RequestQuit_t)(void);
 #endif
 
 /* EGL global variables */
@@ -111,7 +107,7 @@ static int init_display(
 #else
 
         if ((egl_err = eglGetConfigs(egldpy, configs, 2, &no_configs))
-            != EGL_TRUE) {
+                        != EGL_TRUE) {
                 egl_error("eglGetConfigs");
         }
 
@@ -161,7 +157,7 @@ static void egl_error(char *error)
 
 const char *egl_strerror(int code)
 {
-        switch(code) {
+        switch (code) {
         case EGL_SUCCESS:
                 return "EGL_SUCCESS";
         case EGL_NOT_INITIALIZED:
@@ -291,7 +287,7 @@ void RequestQuit(void)
 
 int handle_events(void)
 {
-        if(giQuit) {
+        if (giQuit) {
                 giQuit = 0;
                 return -1;
         }
@@ -312,15 +308,15 @@ JNIEXPORT jint JNICALL Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_init(
         LOGI("init");
 
         c = (*env)->FindClass(env, "android/view/Surface");
-        if(!c)
+        if (!c)
                 return -EFAULT;
 
         gSurfaceFieldID = (*env)->GetFieldID(env, c, "mSurface", "I");
-        if(!gSurfaceFieldID)
+        if (!gSurfaceFieldID)
                 return -EFAULT;
 
         str = (*env)->GetStringUTFChars(env, wrapLib, NULL);
-        if(!str)
+        if (!str)
                 return -EFAULT;
 
         (*env)->ReleaseStringUTFChars(env, wrapLib, str);
@@ -348,13 +344,20 @@ JNIEXPORT void JNICALL Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_requestQui
         RequestQuit();
 }
 
+JNIEXPORT void JNICALL Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_setParams(
+        JNIEnv __unref *env, jobject __unref obj, jint param, jint value)
+{
+        gl_set_app_params(param, value);
+}
+
+
 static int myjniRegisterNativeMethods(JNIEnv* env, const char* className,
                                       const JNINativeMethod* gMethods,
                                       int numMethods)
 {
         jclass clazz;
 
-        LOGV("Registering %s natives\n", className);
+        LOGE("Registering %s natives\n", className);
         clazz = (*env)->FindClass(env, className);
         if (clazz == NULL) {
                 LOGE("Native registration unable to find class '%s'\n", className);
@@ -374,6 +377,7 @@ static JNINativeMethod sMethods[] = {
         {"eglMain", "(Ljava/lang/Object;)I", (void*)Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_eglMain},
         {"resizeWindow", "(II)V", (void*)Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_resizeWindow},
         {"requestQuit", "()V", (void*)Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_requestQuit},
+        {"setParams", "(II)V", (void*)Java_com_imgtec_powervr_ddk_Gles2TexturePlayer_setParams},
 };
 
 extern jint JNI_OnLoad(JavaVM* vm, void __unref *reserved)
@@ -385,7 +389,7 @@ extern jint JNI_OnLoad(JavaVM* vm, void __unref *reserved)
                 return result;
         }
 
-        myjniRegisterNativeMethods(env, "com/imgtec/powervr/ddk/Gles2TexturePlayer/Gles2TexturePlayer", sMethods, 4);
+        myjniRegisterNativeMethods(env, "com/imgtec/powervr/ddk/Gles2TexturePlayer/Gles2TexturePlayer", sMethods, 5);
         return JNI_VERSION_1_4;
 }
 

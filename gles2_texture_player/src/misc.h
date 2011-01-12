@@ -25,13 +25,13 @@
 #define INFO  LOGI
 #define ERROR LOGE
 #else
-extern void timestamp(void);
 #define INFO(fmt, arg...) \
 	do {                                \
 		timestamp(); printf(fmt "\n", ## arg);    \
 	} while (0)
 #define ERROR INFO
-
 #endif	// SUPPORT_ANDROID_PLATFORM
+
+extern void timestamp(void);
 
 #endif /* __MISC_H__ */

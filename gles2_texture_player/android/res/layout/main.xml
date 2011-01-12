@@ -5,13 +5,36 @@
     android:layout_height="fill_parent"
     >
 
+<TextView
+ android:text="@string/mediafile_prompt"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ >
+</TextView>
 
+<Spinner android:id="@+id/SpinnerMediaFileList"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ >
+</Spinner>
 
+<Button android:id="@+id/ButtonLaunchVideo"
+ android:text="@string/button_launchvideo"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ >
+</Button>
 
-<TextView android:text="@string/mediafile_prompt" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-<Spinner android:id="@+id/SpinnerMediaFileList" android:layout_width="wrap_content" android:layout_height="wrap_content"></Spinner>
+<Button android:id="@+id/ButtonLaunchStream"
+ android:text="@string/button_launchstream"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ >
+</Button>
 
-<Button android:text="@string/button_launchvideo" android:id="@+id/ButtonLaunchVideo" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
-<Button android:text="@string/button_launchstream" android:id="@+id/ButtonLaunchStream" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
-
+<CheckBox android:id="@+id/cb_animated"
+ android:text="@string/cb_animated"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+/>
 </LinearLayout>
