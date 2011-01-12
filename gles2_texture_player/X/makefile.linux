@@ -22,7 +22,8 @@ MODULE_CFLAGS = -Wstrict-prototypes
 INCLUDES      = $(UNITTEST_INCLUDES)
 
 VPATH         += ../src/
-SOURCES       = xtexplayer.c maths.c v4l2_gfx.c misc.c texplayer_gles2.c
+SOURCES       = xtexplayer.c maths.c v4l2_gfx.c misc.c texplayer_gles2.c \
+				shader_anim.c shader_flat.c
 
 MODULE_CFLAGS += -DOPENGLES=1
 
