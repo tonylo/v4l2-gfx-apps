@@ -38,7 +38,7 @@
 #define WINDOW_WIDTH 200
 #define WINDOW_HEIGHT 200
 
-#define	MAX_SWAP_INTERVAL 3
+#define MAX_SWAP_INTERVAL 3
 
 /* mark parameter as unused */
 #define UNUSED(x) (void)(x)
@@ -541,8 +541,10 @@ make_window(Display *dpy,
 
 static void usage(char *argv0)
 {
-        fprintf(stderr, "usage: %s [-d display] [-b colourname] [-f #num_frames] [-s #fullscreen] [-p position] [-x left] [-y top] [-w width] [-h height] [-m move] [-r resize] [-a rotate] [-i swap_interval(0-3)] \n", argv0);
+        fprintf(stderr, "usage: %s [-d display] [-b colourname] [-f #num_frames] [-s #fullscreen] [-p position] [-x left] [-y top] [-w width] [-h height] [-m move] [-r resize] [-a rotate] [-i swap_interval(0-3)] [-o animation]\n", argv0);
         fprintf(stderr, "       Where position is between 0 to 11.\n");
+        fprintf(stderr, "       Where animation is 0 (flat texture stream)\n");
+        fprintf(stderr, "       Where animation is 1 (3D animated texture stream)\n");
 
         exit(1);
 }
@@ -576,8 +578,9 @@ int main(int argc, char** argv)
         };
         int frameStop = 1;
         int dev_fd;
+        int anim_opt;
 
-        while ((c = getopt(argc, argv, "d:b:f:s:p:x:y:w:h:m:r:a:i:")) != EOF) {
+        while ((c = getopt(argc, argv, "d:b:f:s:p:x:y:w:h:m:r:a:i:o:")) != EOF) {
                 switch (c) {
                 case 'b':
                         colourname = optarg;
@@ -621,6 +624,10 @@ int main(int argc, char** argv)
                         break;
                 case 'a':
                         view_rotx = atol(optarg);
+                        break;
+                case 'o':
+                        anim_opt = atoi(optarg);
+                        gl_set_app_params(GLAPP_PARM_ANIMATED, anim_opt);
                         break;
                 default:
                         usage(argv[0]);

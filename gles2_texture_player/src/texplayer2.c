@@ -107,7 +107,7 @@ static int init_display(
 #else
 
         if ((egl_err = eglGetConfigs(egldpy, configs, 2, &no_configs))
-                        != EGL_TRUE) {
+            != EGL_TRUE) {
                 egl_error("eglGetConfigs");
         }
 
@@ -395,8 +395,31 @@ extern jint JNI_OnLoad(JavaVM* vm, void __unref *reserved)
 
 #else // SUPPORT_ANDROID_PLATFORM
 
+static void usage(char *argv0)
+{
+        fprintf(stderr, "usage: %s [-o animation]\n", argv0);
+        fprintf(stderr, "       Where animation is 0 (flat texture stream)\n");
+        fprintf(stderr, "       Where animation is 1 (3D animated texture stream)\n");
+}
+
 int main(int argc, char *argv[])
 {
+        int anim_opt;
+        int c;
+        while ((c = getopt(argc, argv, "o:")) != EOF) {
+                switch (c) {
+                case 'o':
+                        anim_opt = atoi(optarg);
+                        gl_set_app_params(GLAPP_PARM_ANIMATED, anim_opt);
+                        break;
+                default:
+                        usage(argv[0]);
+                        break;
+                }
+        }
+        if(optind < argc) {
+                usage(argv[0]);
+        }
         return EglMain(EGL_DEFAULT_DISPLAY, 0);
 }
 
